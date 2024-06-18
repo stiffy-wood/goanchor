@@ -1,0 +1,17 @@
+FROM ubuntu
+
+ARG SOME_VALUE
+ARG test=20
+ARG AnotherTest 10 20 20
+#->|.\Anchorfile.dep
+#->|./test/deep/nested/dir/Anchorfile.dep2
+#->|.\Anchorfile.example
+
+RUN echo \
+    "multine \n" \
+    "test"
+
+ENV SomeENV="Yo"
+ARG test2="someVal=20"
+RUN echo "some long command that \
+    spans across rows"

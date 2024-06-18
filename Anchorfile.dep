@@ -1,0 +1,5 @@
+FROM ubuntu
+
+RUN "maybe"
+
+#->|.\test\deep\nested\dir\Anchorfile.dep2

@@ -1,0 +1,6 @@
+FROM ubuntu
+
+ARG SOME_VALUE
+
+#->|.\Anchorfile.dep
+RUN echo "Doo doo" >> /text
