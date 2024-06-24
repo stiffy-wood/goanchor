@@ -1,31 +1,41 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"goanchor/src/compile"
-	"goanchor/src/file"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
+
+	"github.com/moby/buildkit/frontend/dockerfile/parser"
 )
 
 func main() {
-	r := file.NewReader(context.Background())
+	if len(os.Args) < 2 {
+		fmt.Println("fuuuuuck no")
+	}
 
-	ch := make(chan string)
-	go r.ReadLayers("./Dockerfile.example", false, ch)
-    for {
-        select{
-        case <- r.Done():
-            return
-        case layer := <- ch:
-            //fmt.Printf("########\n\n%s\n\n#########", layer)
-            fmt.Printf("[%s]\n", strings.Join( compile.TokenizeLayer(layer), ", "))
-        }
-    }
+	dockerfile, err := os.Open(os.Args[1])
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	res, err := parser.Parse(dockerfile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var p func(node *parser.Node, indent string)
+	p = func(node *parser.Node, indent string) {
+		fmt.Printf("%s%s\n", indent, node.Value)
+		for _, child := range node.Children {
+			p(child, indent+" ")
+		}
+	}
+
+    p(res.AST, "")
 }
 
 func startDocker() {
