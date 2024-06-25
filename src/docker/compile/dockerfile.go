@@ -65,9 +65,15 @@ func (a *AstIter) GetNext() *NodeInfo {
 		File:       a.file,
 	}
 
-	for n := curNode.Next; n != nil; n = n.Next {
-		info.Value += n.Value
+	values := []string{}
+	if curNode.Value != "" {
+		values = append(values, curNode.Flags...)
 	}
+
+	for n := curNode.Next; n != nil; n = n.Next {
+		values = append(values, n.Value)
+	}
+	info.Value = strings.Join(values, " ")
 
 	for a.iterInfo.Peek() != nil {
 		if a.iterInfo.Peek().childIndex < len(a.iterInfo.Peek().parentNode.Children)-1 {
@@ -190,6 +196,51 @@ func (d *Dockerfile) RaiseAnchors() error {
 		case errToReturn = <-errCh:
 		case <-doneCh:
 			return errToReturn
+		}
+	}
+}
+
+func (d *Dockerfile) isDockerfile() bool {
+	return d.Parent == nil
+}
+
+func (d *Dockerfile) getDockerfile() *Dockerfile {
+	if d.isDockerfile() {
+		return d
+	} else {
+		return d.Parent.getDockerfile()
+	}
+}
+
+func (d *Dockerfile) CleanAnchorfiles() {
+	wg := sync.WaitGroup{}
+
+	wg.Add(1)
+	go d.cleanAnchorfiles(&wg)
+
+	wg.Wait()
+}
+
+func (d *Dockerfile) cleanAnchorfiles(wg *sync.WaitGroup) {
+	defer wg.Done()
+	for _, ap := range d.AnchorPoints {
+		wg.Add(1)
+		go ap.Anchorfile.cleanAnchorfiles(wg)
+	}
+
+	if d.isDockerfile() {
+		return
+	}
+
+	d.removeNode(d.From)
+}
+
+func (d *Dockerfile) removeNode(node *NodeInfo) {
+	pNode := node.ParentNode
+
+	for i, n := range node.ParentNode.Children {
+		if n == node.Node {
+			pNode.Children = append(pNode.Children[:i], pNode.Children[i+1:]...)
 		}
 	}
 }

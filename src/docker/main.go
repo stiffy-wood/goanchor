@@ -22,5 +22,8 @@ func main() {
     if err != nil {
         panic(err)
     }
+
+    df.CleanAnchorfiles()
+
     fmt.Println(df.ToString())
 }
