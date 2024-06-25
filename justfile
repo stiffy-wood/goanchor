@@ -3,4 +3,4 @@ default:
    just --list 
 
 runDocker:
-    go run .\src\docker\ .\Dockerfile.example
+    go run .\src\docker\ .\Dockerfile

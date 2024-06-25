@@ -1,3 +1,0 @@
-FROM t
-
-RUN echo "test"

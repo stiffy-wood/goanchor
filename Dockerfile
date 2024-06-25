@@ -1,4 +1,5 @@
-FROM alpine
+from debian
+#|<-Anchorfile
 
-RUN echo RUN echo
 RUN echo "test"
+

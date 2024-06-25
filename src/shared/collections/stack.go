@@ -11,23 +11,30 @@ type sNode[T any] struct {
 }
 
 func NewStack[T any](init ...T) *Stack[T] {
-    s := &Stack[T]{}
-    for _, v := range init {
-        s.Push(v)
-    }
+	s := &Stack[T]{}
+	for _, v := range init {
+		s.Push(v)
+	}
 	return s
 }
 
 func (s *Stack[T]) Length() int {
-    return s.length
+	return s.length
 }
 
 func (s *Stack[T]) Peek() T {
-	return s.top.value
+	var out T
+	if s.top != nil {
+		out = s.top.value
+	}
+	return out
 }
 
 func (s *Stack[T]) Pop() T {
-	out := s.top.value
+	var out T
+	if s.top != nil {
+		out = s.top.value
+	}
 	s.top = s.top.prev
 	s.length--
 	return out
